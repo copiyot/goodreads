@@ -17,6 +17,7 @@ const main = async () => {
       resolvers: [BookResolver],
       validate: false,
     }),
+    context: () => ({ em: orm.em }),
   });
 
   await apolloServer.start();

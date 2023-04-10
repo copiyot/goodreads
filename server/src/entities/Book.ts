@@ -1,26 +1,35 @@
-import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
-// import { ObjectType, Field } from "type-graphql";
+import { Entity, Enum, PrimaryKey, Property } from "@mikro-orm/core";
+import { CollectionValues } from "../types";
+import { ObjectType, Field } from "type-graphql";
 
-// @ObjectType()
+@ObjectType()
 @Entity()
 export class Book {
-  //   @Field()
+  @Field()
   @PrimaryKey()
   id!: number;
 
-  //   @Field()
+  @Field()
   @Property()
   createdAt?: Date = new Date();
 
-  //   @Field(()=> String)
+  @Field(() => String)
   @Property({ onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
 
-  //   @Field()
+  @Field()
   @Property()
-  name: string;
+  title: string;
 
-  //   @Field()
+  @Field()
   @Property()
-  value: number;
+  author: string;
+
+  @Field()
+  @Property()
+  coverImage: string;
+
+  @Field()
+  @Enum()
+  collection: CollectionValues;
 }
