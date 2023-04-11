@@ -26,6 +26,15 @@ class CreateBookInput {
   collection: CollectionValues;
 }
 
+@InputType()
+class UpdateBookInput {
+  @Field()
+  id: number;
+
+  @Field((type) => CollectionValues)
+  collection: CollectionValues;
+}
+
 @Resolver()
 export class BookResolver {
   @Query(() => [Book])
@@ -41,6 +50,24 @@ export class BookResolver {
     const { title, author, coverImage, collection } = options;
     const book = em.create(Book, { title, author, coverImage, collection });
     await em.persistAndFlush(book);
+    return book;
+  }
+
+  @Mutation(() => Book, { nullable: true })
+  async updateBook(
+    @Arg("options") options: UpdateBookInput,
+    @Ctx() { em }: MyContext
+  ): Promise<Book | null> {
+    const { id, collection } = options;
+    const book = await em.findOne(Book, { id });
+    if (!book) {
+      return null;
+    }
+
+    if (typeof collection !== "undefined") {
+      book.collection = collection;
+      await em.persistAndFlush(book);
+    }
     return book;
   }
 }
