@@ -1,6 +1,11 @@
 import { Entity, Enum, PrimaryKey, Property } from "@mikro-orm/core";
-import { CollectionValues } from "../types";
 import { ObjectType, Field } from "type-graphql";
+
+enum CollectionValues {
+  WANT = "Want to read",
+  READING = "Reading",
+  READ = "Read",
+}
 
 @ObjectType()
 @Entity()
@@ -30,6 +35,6 @@ export class Book {
   coverImage: string;
 
   @Field()
-  @Enum()
+  @Enum(() => CollectionValues)
   collection: CollectionValues;
 }

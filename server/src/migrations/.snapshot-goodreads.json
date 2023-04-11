@@ -64,11 +64,16 @@
         },
         "collection": {
           "name": "collection",
-          "type": "smallint",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
+          "enumItems": [
+            "Want to read",
+            "Reading",
+            "Read"
+          ],
           "mappedType": "enum"
         }
       },
