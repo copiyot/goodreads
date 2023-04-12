@@ -31,6 +31,9 @@ class RegisterUserInput {
   email: string;
 
   @Field()
+  username: string;
+
+  @Field()
   password: string;
 }
 
@@ -67,6 +70,8 @@ export class UserResolver {
 
     const user = await em.findOne(User, { id });
 
+    console.log("JWT", req.session.jwt);
+
     return user;
   }
 
@@ -75,13 +80,12 @@ export class UserResolver {
     @Arg("options") options: RegisterUserInput,
     @Ctx() { em }: MyContext
   ): Promise<UserResponse> {
-    const { email, password } = options;
+    const { email, username, password } = options;
 
     const hashedPassword = await argon2.hash(password);
 
-    const user = em.create(User, { email, password: hashedPassword });
+    const user = em.create(User, { email, username, password: hashedPassword });
 
-    //TODO: Add username to register
     try {
       await em.persistAndFlush(user);
     } catch (err) {
@@ -105,9 +109,9 @@ export class UserResolver {
     @Arg("options") options: RegisterUserInput,
     @Ctx() { em, req }: MyContext
   ): Promise<UserResponse> {
-    const { email, password } = options;
+    const { username, password } = options;
 
-    const user = await em.findOne(User, { email });
+    const user = await em.findOne(User, { username });
 
     if (!user) {
       return {
