@@ -22,7 +22,7 @@ class CreateBookInput {
   @Field()
   coverImage: string;
 
-  @Field((type) => CollectionValues)
+  @Field((_type) => CollectionValues)
   collection: CollectionValues;
 }
 
@@ -31,7 +31,7 @@ class UpdateBookInput {
   @Field()
   id: number;
 
-  @Field((type) => CollectionValues)
+  @Field((_type) => CollectionValues)
   collection: CollectionValues;
 }
 

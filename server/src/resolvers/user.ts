@@ -1,6 +1,7 @@
 import {
   Resolver,
   Mutation,
+  Query,
   InputType,
   ObjectType,
   Field,
@@ -17,6 +18,11 @@ declare module "express-session" {
   interface SessionData {
     jwt: string;
   }
+}
+
+interface UserPayload {
+  id: number;
+  email: string;
 }
 
 @InputType()
@@ -48,6 +54,22 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @Query(() => User, { nullable: true })
+  async me(@Ctx() { req, em }: MyContext) {
+    if (!req.session.jwt) {
+      return null;
+    }
+
+    const { id } = jwt.verify(
+      req.session.jwt,
+      process.env.JWT_KEY!
+    ) as UserPayload;
+
+    const user = await em.findOne(User, { id });
+
+    return user;
+  }
+
   @Mutation(() => UserResponse)
   async register(
     @Arg("options") options: RegisterUserInput,
@@ -116,7 +138,7 @@ export class UserResolver {
         id: user.id,
         email: user.email,
       },
-      "J@k0d0ng0"
+      process.env.JWT_KEY!
     );
 
     req.session.jwt = userJwt;

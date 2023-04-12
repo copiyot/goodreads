@@ -7,6 +7,7 @@ import session from "express-session";
 import cors from "cors";
 import Redis from "ioredis";
 import RedisStore from "connect-redis";
+require("dotenv").config();
 
 import mikroOrmConfig from "./mikro-orm.config";
 import { BookResolver } from "./resolvers/book";
@@ -38,10 +39,9 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 3, // 3 hours
         httpOnly: true,
         secure: __prod__,
-        /*sameSite: "none",*/
       },
       saveUninitialized: false,
-      secret: "J@k0d0ng0",
+      secret: process.env.SESSION_SECRET!,
       resave: false,
     })
   );
@@ -55,7 +55,7 @@ const main = async () => {
   });
 
   await apolloServer.start();
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(4000, () => {
     console.log("Listening on Port: 4000");
