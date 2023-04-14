@@ -1,0 +1,23 @@
+mutation CreateBook(
+  $title: String!
+  $author: String!
+  $coverImage: String!
+  $collection: CollectionValues!
+) {
+  createBook(
+    options: {
+      title: $title
+      author: $author
+      coverImage: $coverImage
+      collection: $collection
+    }
+  ) {
+    id
+    createdAt
+    updatedAt
+    title
+    author
+    coverImage
+    collection
+  }
+}

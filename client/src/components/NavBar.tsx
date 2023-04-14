@@ -5,6 +5,7 @@ import {
   MeDocument,
   useLogoutMutation,
   useMeQuery,
+  BooksDocument,
 } from "../generated/graphql";
 
 const NavBar = () => {
@@ -49,6 +50,9 @@ const NavBar = () => {
               refetchQueries: [
                 {
                   query: MeDocument,
+                },
+                {
+                  query: BooksDocument,
                 },
               ],
             })

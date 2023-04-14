@@ -3,7 +3,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRouter } from "next/router";
 
-import { MeDocument, useRegisterMutation } from "../generated/graphql";
+import {
+  MeDocument,
+  useRegisterMutation,
+  BooksDocument,
+} from "../generated/graphql";
+
+import NavBar from "../components/NavBar";
 
 const schema = yup
   .object({
@@ -48,6 +54,9 @@ const Register = () => {
         {
           query: MeDocument,
         },
+        {
+          query: BooksDocument,
+        },
       ],
     });
     if (response.data?.register.errors) {
@@ -63,43 +72,49 @@ const Register = () => {
   };
 
   return (
-    <section className="bg-gray-50 min-h-screen flex items-center justify-center">
-      <div className="bg-gray-100 rounded-2xl shadow-lg max-w-3x1 p-5 items-center">
-        <h2 className="font-bold text-2x1 text-[#002D74]">Register</h2>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
-          <input
-            className="p-2 mt-8 rounded-xl border"
-            type="text"
-            {...register("email")}
-            placeholder="Email"
-          />
-          <div className="text-[13px] text-[#bf1650]">
-            {errors.email?.message}
-          </div>
-          <input
-            className="p-2 rounded-xl border"
-            type="text"
-            placeholder="User Name"
-            {...register("username")}
-          />
-          <div className="text-[13px] text-[#bf1650]">
-            {errors.username?.message}
-          </div>
-          <input
-            className="p-2 rounded-xl border"
-            type="password"
-            {...register("password")}
-            placeholder="Password"
-          />
-          <div className="text-[13px] text-[#bf1650]">
-            {errors.password?.message}
-          </div>
-          <button className="bg-[#002D74] rounded-xl text-white py-2 hover:scale-105 duration-300">
-            Register
-          </button>
-        </form>
-      </div>
-    </section>
+    <>
+      <NavBar />
+      <section className="bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="bg-gray-100 rounded-2xl shadow-lg max-w-3x1 p-5 items-center">
+          <h2 className="font-bold text-2x1 text-[#002D74]">Register</h2>
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <input
+              className="p-2 mt-8 rounded-xl border"
+              type="text"
+              {...register("email")}
+              placeholder="Email"
+            />
+            <div className="text-[13px] text-[#bf1650]">
+              {errors.email?.message}
+            </div>
+            <input
+              className="p-2 rounded-xl border"
+              type="text"
+              placeholder="User Name"
+              {...register("username")}
+            />
+            <div className="text-[13px] text-[#bf1650]">
+              {errors.username?.message}
+            </div>
+            <input
+              className="p-2 rounded-xl border"
+              type="password"
+              {...register("password")}
+              placeholder="Password"
+            />
+            <div className="text-[13px] text-[#bf1650]">
+              {errors.password?.message}
+            </div>
+            <button className="bg-[#002D74] rounded-xl text-white py-2 hover:scale-105 duration-300">
+              Register
+            </button>
+          </form>
+        </div>
+      </section>
+    </>
   );
 };
 

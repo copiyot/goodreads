@@ -22,6 +22,7 @@ export type Book = {
   collection: Scalars['String'];
   coverImage: Scalars['String'];
   createdAt: Scalars['DateTime'];
+  creatorId: Scalars['Float'];
   id: Scalars['Float'];
   title: Scalars['String'];
   updatedAt: Scalars['String'];
@@ -111,6 +112,16 @@ export type UserResponse = {
 
 export type UserFieldsFragment = { __typename?: 'User', id: number, username: string };
 
+export type CreateBookMutationVariables = Exact<{
+  title: Scalars['String'];
+  author: Scalars['String'];
+  coverImage: Scalars['String'];
+  collection: CollectionValues;
+}>;
+
+
+export type CreateBookMutation = { __typename?: 'Mutation', createBook?: { __typename?: 'Book', id: number, createdAt: any, updatedAt: string, title: string, author: string, coverImage: string, collection: string } | null };
+
 export type LoginMutationVariables = Exact<{
   username: Scalars['String'];
   password: Scalars['String'];
@@ -149,6 +160,50 @@ export const UserFieldsFragmentDoc = gql`
   username
 }
     `;
+export const CreateBookDocument = gql`
+    mutation CreateBook($title: String!, $author: String!, $coverImage: String!, $collection: CollectionValues!) {
+  createBook(
+    options: {title: $title, author: $author, coverImage: $coverImage, collection: $collection}
+  ) {
+    id
+    createdAt
+    updatedAt
+    title
+    author
+    coverImage
+    collection
+  }
+}
+    `;
+export type CreateBookMutationFn = Apollo.MutationFunction<CreateBookMutation, CreateBookMutationVariables>;
+
+/**
+ * __useCreateBookMutation__
+ *
+ * To run a mutation, you first call `useCreateBookMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateBookMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createBookMutation, { data, loading, error }] = useCreateBookMutation({
+ *   variables: {
+ *      title: // value for 'title'
+ *      author: // value for 'author'
+ *      coverImage: // value for 'coverImage'
+ *      collection: // value for 'collection'
+ *   },
+ * });
+ */
+export function useCreateBookMutation(baseOptions?: Apollo.MutationHookOptions<CreateBookMutation, CreateBookMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateBookMutation, CreateBookMutationVariables>(CreateBookDocument, options);
+      }
+export type CreateBookMutationHookResult = ReturnType<typeof useCreateBookMutation>;
+export type CreateBookMutationResult = Apollo.MutationResult<CreateBookMutation>;
+export type CreateBookMutationOptions = Apollo.BaseMutationOptions<CreateBookMutation, CreateBookMutationVariables>;
 export const LoginDocument = gql`
     mutation Login($username: String!, $password: String!) {
   login(username: $username, password: $password) {
