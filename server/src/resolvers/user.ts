@@ -13,6 +13,7 @@ import jwt from "jsonwebtoken";
 
 import { MyContext } from "../types";
 import { User } from "../entities/User";
+import { COOKIE_NAME } from "../constants";
 
 declare module "express-session" {
   interface SessionData {
@@ -58,7 +59,7 @@ class UserResponse {
 @Resolver()
 export class UserResolver {
   @Query(() => User, { nullable: true })
-  async me(@Ctx() { req, em }: MyContext) {
+  async me(@Ctx() { req }: MyContext) {
     if (!req.session.jwt) {
       return null;
     }
@@ -68,9 +69,7 @@ export class UserResolver {
       process.env.JWT_KEY!
     ) as UserPayload;
 
-    const user = await em.findOne(User, { id });
-
-    console.log("JWT", req.session.jwt);
+    const user = await User.findOneBy({ id });
 
     return user;
   }
@@ -78,16 +77,20 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async register(
     @Arg("options") options: RegisterUserInput,
-    @Ctx() { em }: MyContext
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     const { email, username, password } = options;
 
     const hashedPassword = await argon2.hash(password);
 
-    const user = em.create(User, { email, username, password: hashedPassword });
+    let user;
 
     try {
-      await em.persistAndFlush(user);
+      user = await User.create({
+        email,
+        username,
+        password: hashedPassword,
+      }).save();
     } catch (err) {
       if (err.detail.includes("already exists")) {
         return {
@@ -101,17 +104,26 @@ export class UserResolver {
       }
     }
 
+    const userJwt = jwt.sign(
+      {
+        id: user?.id,
+        email: user?.email,
+      },
+      process.env.JWT_KEY!
+    );
+
+    req.session.jwt = userJwt;
+
     return { user };
   }
 
   @Mutation(() => UserResponse)
   async login(
-    @Arg("options") options: RegisterUserInput,
-    @Ctx() { em, req }: MyContext
+    @Arg("username") username: string,
+    @Arg("password") password: string,
+    @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
-    const { username, password } = options;
-
-    const user = await em.findOne(User, { username });
+    const user = await User.findOne({ where: { username } });
 
     if (!user) {
       return {
@@ -148,5 +160,21 @@ export class UserResolver {
     req.session.jwt = userJwt;
 
     return { user };
+  }
+
+  @Mutation(() => Boolean)
+  logout(@Ctx() { req, res }: MyContext) {
+    return new Promise((resolve) =>
+      req.session.destroy((err) => {
+        res.clearCookie(COOKIE_NAME);
+        if (err) {
+          console.log(err);
+          resolve(false);
+          return;
+        }
+
+        resolve(true);
+      })
+    );
   }
 }

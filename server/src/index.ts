@@ -1,5 +1,4 @@
 import "reflect-metadata";
-import { MikroORM } from "@mikro-orm/core";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
@@ -8,15 +7,28 @@ import cors from "cors";
 import Redis from "ioredis";
 import RedisStore from "connect-redis";
 require("dotenv").config();
+import { DataSource } from "typeorm";
 
-import mikroOrmConfig from "./mikro-orm.config";
 import { BookResolver } from "./resolvers/book";
 import { UserResolver } from "./resolvers/user";
 import { COOKIE_NAME, __prod__ } from "./constants";
+import { Book } from "./entities/Book";
+import { User } from "./entities/User";
 
 const main = async () => {
-  const orm = await MikroORM.init(mikroOrmConfig);
-  await orm.getMigrator().up();
+  const AppDataSource = new DataSource({
+    type: "postgres",
+    host: "localhost",
+    port: 5432,
+    username: "castroopiyo",
+    password: "J@k0d0ng0",
+    database: "goodreads_clone",
+    entities: [User, Book],
+    synchronize: true,
+    logging: true,
+  });
+
+  AppDataSource.initialize();
 
   const app = express();
 
@@ -51,7 +63,7 @@ const main = async () => {
       resolvers: [BookResolver, UserResolver],
       validate: false,
     }),
-    context: ({ req, res }) => ({ em: orm.em, req, res }),
+    context: ({ req, res }) => ({ req, res }),
   });
 
   await apolloServer.start();

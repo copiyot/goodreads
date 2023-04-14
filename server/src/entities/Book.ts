@@ -1,5 +1,14 @@
-import { Entity, Enum, PrimaryKey, Property } from "@mikro-orm/core";
 import { ObjectType, Field } from "type-graphql";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Column,
+  BaseEntity,
+  ManyToOne,
+} from "typeorm";
+import { User } from "./User";
 
 enum CollectionValues {
   WANT = "Want to read",
@@ -9,32 +18,42 @@ enum CollectionValues {
 
 @ObjectType()
 @Entity()
-export class Book {
+export class Book extends BaseEntity {
   @Field()
-  @PrimaryKey()
+  @PrimaryGeneratedColumn()
   id!: number;
 
   @Field()
-  @Property()
-  createdAt?: Date = new Date();
+  @CreateDateColumn()
+  createdAt: Date;
 
   @Field(() => String)
-  @Property({ onUpdate: () => new Date() })
-  updatedAt?: Date = new Date();
+  @UpdateDateColumn()
+  updatedAt = new Date();
 
   @Field()
-  @Property()
+  @Column()
   title: string;
 
   @Field()
-  @Property()
+  @Column()
   author: string;
 
   @Field()
-  @Property()
+  @Column()
   coverImage: string;
 
   @Field()
-  @Enum(() => CollectionValues)
+  @Column()
+  creatorId: number;
+
+  @Field()
+  @Column({
+    type: "enum",
+    enum: CollectionValues,
+  })
   collection: CollectionValues;
+
+  @ManyToOne(() => User, (user) => user.books)
+  creator: User;
 }

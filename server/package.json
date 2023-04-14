@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "watch": "tsc -w",
-    "start": "nodemon dist/index.js",
-    "create:migration": "npx mikro-orm migration:create"
+    "start": "nodemon dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -24,10 +23,6 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@mikro-orm/cli": "^5.6.16",
-    "@mikro-orm/core": "^5.6.16",
-    "@mikro-orm/migrations": "^5.6.16",
-    "@mikro-orm/postgresql": "^5.6.16",
     "apollo-server-express": "^3.12.0",
     "argon2": "^0.30.3",
     "connect-redis": "^7.0.1",
@@ -41,7 +36,8 @@
     "pg": "^8.10.0",
     "redis": "^4.6.5",
     "reflect-metadata": "^0.1.13",
-    "type-graphql": "^1.1.1"
+    "type-graphql": "^1.1.1",
+    "typeorm": "^0.3.14"
   },
   "mikro-orm": {
     "useTsNode": true,

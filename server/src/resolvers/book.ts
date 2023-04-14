@@ -2,11 +2,12 @@ import {
   Resolver,
   Query,
   Mutation,
-  Ctx,
   Arg,
   InputType,
   Field,
+  Ctx,
 } from "type-graphql";
+import jwt from "jsonwebtoken";
 
 import { CollectionValues, MyContext } from "../types";
 import { Book } from "../entities/Book";
@@ -35,38 +36,67 @@ class UpdateBookInput {
   collection: CollectionValues;
 }
 
+interface UserPayload {
+  id: number;
+  email: string;
+}
+
 @Resolver()
 export class BookResolver {
   @Query(() => [Book])
-  books(@Ctx() { em }: MyContext): Promise<Book[]> {
-    return em.find(Book, {});
+  async books(@Ctx() { req }: MyContext): Promise<Book[] | []> {
+    if (!req.session.jwt) {
+      return [];
+    }
+
+    const { id } = jwt.verify(
+      req.session.jwt,
+      process.env.JWT_KEY!
+    ) as UserPayload;
+
+    const books = await Book.find({ where: { creatorId: id } });
+    return books;
   }
 
   @Mutation(() => Book, { nullable: true })
   async createBook(
     @Arg("options") options: CreateBookInput,
-    @Ctx() { em }: MyContext
-  ): Promise<Book> {
+    @Ctx() { req }: MyContext
+  ): Promise<Book | null> {
     const { title, author, coverImage, collection } = options;
-    const book = em.create(Book, { title, author, coverImage, collection });
-    await em.persistAndFlush(book);
+
+    if (!req.session.jwt) {
+      return null;
+    }
+
+    const { id } = jwt.verify(
+      req.session.jwt,
+      process.env.JWT_KEY!
+    ) as UserPayload;
+
+    const book = await Book.create({
+      title,
+      author,
+      coverImage,
+      collection,
+      creatorId: id,
+    }).save();
+
     return book;
   }
 
   @Mutation(() => Book, { nullable: true })
   async updateBook(
-    @Arg("options") options: UpdateBookInput,
-    @Ctx() { em }: MyContext
+    @Arg("options") options: UpdateBookInput
   ): Promise<Book | null> {
     const { id, collection } = options;
-    const book = await em.findOne(Book, { id });
+    const book = await Book.findOneBy({ id });
     if (!book) {
       return null;
     }
 
     if (typeof collection !== "undefined") {
-      book.collection = collection;
-      await em.persistAndFlush(book);
+      await Book.update({ id }, { collection });
     }
     return book;
   }
