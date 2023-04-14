@@ -7,28 +7,14 @@ import cors from "cors";
 import Redis from "ioredis";
 import RedisStore from "connect-redis";
 require("dotenv").config();
-import { DataSource } from "typeorm";
 
 import { BookResolver } from "./resolvers/book";
 import { UserResolver } from "./resolvers/user";
 import { COOKIE_NAME, __prod__ } from "./constants";
-import { Book } from "./entities/Book";
-import { User } from "./entities/User";
+import { AppDataSource } from "./dataSourceConfig";
 
 const main = async () => {
-  const AppDataSource = new DataSource({
-    type: "postgres",
-    host: "localhost",
-    port: 5432,
-    username: "castroopiyo",
-    password: "J@k0d0ng0",
-    database: "goodreads_clone",
-    entities: [User, Book],
-    synchronize: true,
-    logging: true,
-  });
-
-  AppDataSource.initialize();
+  (await AppDataSource.initialize()).runMigrations();
 
   const app = express();
 
