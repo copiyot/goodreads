@@ -1,12 +1,17 @@
 import { useState } from "react";
 import { AiOutlineClose, AiOutlineMenu } from "react-icons/ai";
 import Link from "next/link";
-import { useMeQuery } from "../generated/graphql";
+import {
+  MeDocument,
+  useLogoutMutation,
+  useMeQuery,
+} from "../generated/graphql";
 
 const NavBar = () => {
   const [iconToDisplay, setIconToDisplay] = useState("AiOutlineMenu");
 
   const { data, loading, error } = useMeQuery();
+  const [logoutUser] = useLogoutMutation();
 
   let body = null;
 
@@ -37,7 +42,19 @@ const NavBar = () => {
     body = (
       <>
         <li className="mx-4 my-6 md:my-0 text-xl">{data?.me?.username}</li>
-        <button className="bg-gray-100 text-[#002D74] rounded-xl text-white p-2 hover:scale-105 duration-300">
+        <button
+          onClick={() =>
+            logoutUser({
+              awaitRefetchQueries: true,
+              refetchQueries: [
+                {
+                  query: MeDocument,
+                },
+              ],
+            })
+          }
+          className="bg-gray-100 text-[#002D74] rounded-xl text-white p-2 hover:scale-105 duration-300"
+        >
           logout
         </button>
       </>

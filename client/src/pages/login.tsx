@@ -3,7 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRouter } from "next/router";
 
-import { useLoginMutation } from "../generated/graphql";
+import { MeDocument, useLoginMutation } from "../generated/graphql";
 import NavBar from "../components/NavBar";
 
 const schema = yup
@@ -39,6 +39,12 @@ const Login = () => {
 
     const response = await loginUser({
       variables: { username, password },
+      awaitRefetchQueries: true,
+      refetchQueries: [
+        {
+          query: MeDocument,
+        },
+      ],
     });
     if (response.data?.login.errors) {
       for (const userError of response.data?.login.errors) {
@@ -55,7 +61,7 @@ const Login = () => {
   return (
     <div>
       <NavBar />
-      <section className="bg-gray-50 min-h-screen flex items-center justify-center">
+      <section className="bg-gray-50 m-h-screen flex items-center justify-center">
         <div className="bg-gray-100 rounded-2xl shadow-lg max-w-3x1 p-5 items-center">
           <h2 className="font-bold text-2x1 text-[#002D74]">Login</h2>
           <form

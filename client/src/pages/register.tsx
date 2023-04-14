@@ -3,7 +3,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRouter } from "next/router";
 
-import { useRegisterMutation } from "../generated/graphql";
+import { MeDocument, useRegisterMutation } from "../generated/graphql";
 
 const schema = yup
   .object({
@@ -43,6 +43,12 @@ const Register = () => {
 
     const response = await registerUser({
       variables: { email, username, password },
+      awaitRefetchQueries: true,
+      refetchQueries: [
+        {
+          query: MeDocument,
+        },
+      ],
     });
     if (response.data?.register.errors) {
       for (const userError of response.data?.register.errors) {
