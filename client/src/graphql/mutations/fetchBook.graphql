@@ -1,0 +1,11 @@
+mutation FetchBook($bookId: Float!) {
+  book(bookId: $bookId) {
+    id
+    createdAt
+    updatedAt
+    title
+    author
+    coverImage
+    collection
+  }
+}

@@ -1,0 +1,11 @@
+mutation UpdateBook($id: Float!, $collection: CollectionValues!) {
+  updateBook(options: { id: $id, collection: $collection }) {
+    id
+    createdAt
+    updatedAt
+    title
+    author
+    coverImage
+    collection
+  }
+}

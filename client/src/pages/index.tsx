@@ -41,6 +41,9 @@ const Home = () => {
                   <th className="p-3 text-sm font-semibold tracking-wide text-left">
                     Cover Image
                   </th>
+                  <th className="p-3 text-sm font-semibold tracking-wide text-left">
+                    Edit Book
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -63,6 +66,14 @@ const Home = () => {
                     </td>
                     <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
                       {book.coverImage}
+                    </td>
+                    <td className="p-3 text-sm text-gray-700 whitespace-nowrap">
+                      <Link
+                        href={`/edit_book/${book.id}`}
+                        className="bg-[#002D74] rounded-md text-white p-2 hover:scale-105 duration-300"
+                      >
+                        Edit
+                      </Link>
                     </td>
                   </tr>
                 ))}
